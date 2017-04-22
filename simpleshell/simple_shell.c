@@ -22,6 +22,7 @@ void runcommand(char* command, char** args, int in, int out, int pipe, char inpu
   } else { // child'
       
       if (in){ // if '<'' is detected in input
+        printf("< is detected");
         int fd0;
         if (( fd0 = open(input, O_RDONLY, 0)) < 0){
           perror("Couldn't open input file");
@@ -31,6 +32,15 @@ void runcommand(char* command, char** args, int in, int out, int pipe, char inpu
         close(fd0);
       }
       
+      if (out){
+        int fd1;
+        if ((fd1 = creat(output, 0644))<0){
+          perror("Couldn't open the output file");
+          exit(0);
+        }
+        dup2(fd1, STDOUT_FILENO);
+        close(fd1);
+      }
     	execvp(command, args);
       perror("execvp");
       exit(1);
